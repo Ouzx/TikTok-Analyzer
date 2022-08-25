@@ -18,12 +18,13 @@ class Page(Base):
     followers = Column(Integer)
     likes = Column(Integer)
     bio = Column(String)
+    post_count = Column(Integer)
     create_date = Column(DateTime)
     update_date = Column(DateTime)
     link = Column(String, unique=True)
 
     def __repr__(self):
-        return f"Page(id={self.id}, name={self.name}, following={self.following}, followers={self.followers}, likes={self.likes}, bio={self.bio}, create_date={self.create_date}, update_date={self.update_date}, link={self.link})"
+        return f"Page(name='{self.name}', following={self.following}, followers={self.followers}, likes={self.likes}, bio='{self.bio}', post_count={self.post_count}, create_date={self.create_date}, update_date={self.update_date}, link='{self.link}')"
 
 
 class Post(Base):
@@ -69,6 +70,7 @@ def create_page(page_data):
             followers=page_data['followers'],
             likes=page_data['likes'],
             bio=page_data['bio'],
+            post_count=page_data['post_count'],
             create_date=datetime.datetime.now(),
             update_date=datetime.datetime.now(),
             link=page_data['link']
@@ -81,6 +83,7 @@ def create_page(page_data):
         page.followers = page_data['followers']
         page.likes = page_data['likes']
         page.bio = page_data['bio']
+        page.post_count = page_data['post_count']
         page.update_date = datetime.datetime.now()
         session.commit()
 
