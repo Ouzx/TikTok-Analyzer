@@ -1,2 +1,4 @@
 /.venv
 link.txt
+*.pyc
+*.db

@@ -38,7 +38,9 @@ class Scraper:
         for post in posts:
             self.posts_data.append(self.get_post_data(post))
 
-        for post_data in self.posts_data:
+        for i, post_data in enumerate(self.posts_data):
+            logger.Log(
+                f"{round(i / self.post_count * 100, 2)}%")
             self.driver.get(post_data['link'])
             post_data.update(self.get_inner_post_data(post_data))
 
