@@ -8,10 +8,26 @@ selectors = {
     "acc_likes": ".e1457k4r1:nth-child(3) strong",
     "acc_bio": ".e1457k4r3",
 
-    "post": ".e1yey0rl1",
+    "post": ".e1cg0wnj1",
     "post_like": ".e1hk3hf90:nth-child(1) .e1hk3hf92",
     "post_comment": ".e1hk3hf90+ .e1hk3hf90 .e1hk3hf92",
-    "post_view": "video-count tiktok-1p23b18-StrongVideoCount e148ts222",
-    "post_name": ".ejg0rhn0",
-    "post_link": "",
+    "post_view": ".e148ts222",
+    "post_name": ".e1yey0rl0 > img",
+    "post_link": "a",
+}
+
+page_template = {
+    "following": "",
+    "followers": "",
+    "likes": "",
+    "bio": "",
+}
+
+post_template = {
+    "like": 0,
+    "comment": 0,
+    "view": 0,
+    "name": "",
+    "link": "",
+    "index": 0,
 }
