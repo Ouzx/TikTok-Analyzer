@@ -4,6 +4,8 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
+from fake_useragent import UserAgent
+
 import logger.main as logger
 import scraper.strings as stri
 import db.main as DB
@@ -136,6 +138,9 @@ class Scraper:
 
     @ staticmethod
     def get_options():
+        ua = UserAgent()
+        userAgent = ua.random
         options = webdriver.ChromeOptions()
+        options.add_argument(f'user-agent={userAgent}')
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
         return options
