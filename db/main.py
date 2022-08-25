@@ -5,6 +5,8 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import ForeignKey
 
+import logger.main as logger
+
 engine = create_engine('sqlite:///db/tiktok.db')
 Base = declarative_base()
 
@@ -60,6 +62,7 @@ Session = sessionmaker(bind=engine)
 
 
 def create_page(page_data):
+    logger.Log(f"Creating page {page_data['name']}")
     session = Session()
 
     page = session.query(Page).filter(Page.link == page_data['link']).first()
@@ -86,11 +89,12 @@ def create_page(page_data):
         page.post_count = page_data['post_count']
         page.update_date = datetime.datetime.now()
         session.commit()
-
+    logger.Log(f"Page created: {page}")
     session.close()
 
 
 def create_post(post_data):
+    logger.Log(f"Creating post {post_data['name']}")
     session = Session()
     post = session.query(Post).filter(Post.link == post_data['link']).first()
     if post is None:
@@ -107,10 +111,12 @@ def create_post(post_data):
     else:
         post.update_date = datetime.datetime.now()
         session.commit()
+    logger.Log(f"Post created: {post}")
     session.close()
 
 
 def create_post_activity(post_activity_data):
+    logger.Log(f"Creating post activity {post_activity_data['post_link']}")
     session = Session()
     post_id = session.query(Post).filter(
         Post.link == post_activity_data['post_link']).first().id
@@ -123,4 +129,5 @@ def create_post_activity(post_activity_data):
     )
     session.add(post_activity)
     session.commit()
+    logger.Log(f"Post activity created: {post_activity}")
     session.close()

@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 
 import logger.main as logger
 import scraper.strings as stri
+import db.main as DB
 
 
 class Scraper:
@@ -14,26 +15,37 @@ class Scraper:
             stri.driver_path, options=self.get_options())
 
         self.post_count = 0
+        self.link = Scraper.get_base_link()
 
-        self.driver.get(Scraper.get_base_link())
+        self.page_data = {}
+        self.posts_data = []
+        self.posts_activity = []
+
+        self.driver.get(self.link)
         self.scrape()
         self.driver.close()
 
     def scrape(self):
-        self.get_page_data()
         self.scroll_end_of_page()
 
+        self.page_data = self.get_page_data()
         posts = self.get_posts()
-        posts_data = []
-        for index, post in enumerate(posts):
-            posts_data.append(self.get_post_data(post, index))
-        for (index, post_data) in enumerate(posts_data):
+
+        posts = reversed(posts)
+
+        for post in posts:
+            self.posts_data.append(self.get_post_data(post))
+
+        for post_data in self.posts_data:
             self.driver.get(post_data['link'])
             post_data.update(self.get_inner_post_data(post_data))
-            # posts_data[index] = post_data
+
+        self.SaveData()
 
     def get_page_data(self):
         page_data = stri.page_template.copy()
+        page_data['name'] = self.driver.find_element(
+            By.CSS_SELECTOR, stri.selectors["acc"]).text
         page_data["following"] = self.driver.find_element(
             By.CSS_SELECTOR, stri.selectors["acc_following"]).text
         page_data["followers"] = self.driver.find_element(
@@ -54,7 +66,7 @@ class Scraper:
         logger.Log(f"Found {len(posts)} posts")
         return posts
 
-    def get_post_data(self, post, index):
+    def get_post_data(self, post):
         post_data = stri.post_template.copy()
         post_data['view'] = post.find_element(
             By.CSS_SELECTOR, stri.selectors["post_view"]).text
@@ -62,8 +74,8 @@ class Scraper:
             By.CSS_SELECTOR, stri.selectors["post_name"]).get_attribute('alt')
         post_data['link'] = post.find_element(
             By.CSS_SELECTOR, stri.selectors["post_link"]).get_attribute("href")
-        post_data['index'] = index
-        logger.Log(f"Post data: {post_data}")
+
+        logger.Log(f"Post outer data: {post_data}")
         return post_data
 
     def get_inner_post_data(self, post_data):
@@ -71,8 +83,37 @@ class Scraper:
             By.CSS_SELECTOR, stri.selectors["post_like"]).text
         post_data['comment'] = self.driver.find_element(
             By.CSS_SELECTOR, stri.selectors["post_comment"]).text
-        logger.Log(f"Post data: {post_data}")
+        logger.Log(f"Total post data: {post_data}")
         return post_data
+
+    def SaveData(self):
+        _page_data = {
+            "name": self.page_data["name"],
+            "following": self.page_data["following"],
+            "followers": self.page_data["followers"],
+            "likes": self.page_data["likes"],
+            "bio": self.page_data["bio"],
+            "post_count": self.post_count,
+            "link": self.link
+        }
+        DB.create_page(_page_data)
+
+        for post_data in self.posts_data:
+            _post_data = {
+                "page_link": self.link,
+                "link": post_data["link"],
+                "name": post_data["name"],
+            }
+
+            _post_activity = {
+                "post_link": post_data["link"],
+                "like": post_data["like"],
+                "comment": post_data["comment"],
+                "view": post_data["view"]
+            }
+
+            DB.create_post(_post_data)
+            DB.create_post_activity(_post_activity)
 
     def scroll_end_of_page(self):
         logger.Log("Scrolling to the end of the page")
