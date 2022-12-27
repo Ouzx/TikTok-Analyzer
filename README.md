@@ -1,3 +1,3 @@
 # TikTok-Analyzer
 
-With this tool you can collect your tiktok accounts progress.
+With this tool you can collect data of your tiktok accounts progress.
